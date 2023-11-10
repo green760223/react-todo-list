@@ -16,7 +16,7 @@ function App() {
           <Route path='/register' element={<Register />} />
         </Route>
         <Route path='/todo' element={<Todo />} />
-        <Route path='/*' element={<NotFound />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </HashRouter>
   )
