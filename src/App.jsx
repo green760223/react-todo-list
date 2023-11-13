@@ -4,8 +4,8 @@ import Auth from "./views/Auth.jsx"
 import Todo from "./views/Todo.jsx"
 import Login from "./views/Login.jsx"
 import Register from "./views/Register.jsx"
-import "./css/style.css"
 import NotFound from "./views/NotFound.jsx"
+import "./css/style.css"
 
 function App() {
   return (

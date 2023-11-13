@@ -1,4 +1,11 @@
+import { useNavigate } from "react-router-dom"
+
 function Todo() {
+  // Read environment variables
+  const { VITE_APP_HOST } = import.meta.env
+
+  const navigate = useNavigate()
+
   return (
     <>
       <div id='todoListPage' className='bg-half'>

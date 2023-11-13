@@ -1,7 +1,7 @@
-import axios from "axios"
 import { useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
+import axios from "axios"
 
 function Login() {
   const { VITE_APP_HOST } = import.meta.env
@@ -9,11 +9,18 @@ function Login() {
   const emailRef = useRef()
   const passwordRef = useRef()
   const [isEmailEmpty, setIsEmailEmpty] = useState(true)
+  const [isPasswordEmpty, setIsPasswordEmpty] = useState(true)
 
   // Email input check function
   const handleEmailChange = () => {
     const emailInput = emailRef.current.value
     setIsEmailEmpty(!emailInput)
+  }
+
+  // Password input check function
+  const handlePasswordChange = () => {
+    const passwordInput = passwordRef.current.value
+    setIsPasswordEmpty(passwordInput.length < 6)
   }
 
   // Login function
@@ -30,14 +37,20 @@ function Login() {
       const token = response.data.token
       const tokenDuration = new Date()
       tokenDuration.setDate(tokenDuration.getDate() + 1)
-      document.cookie = `token=${token}; expires=${tokenDuration.toUTCString()}`
+      document.cookie = `token=${token}; expires=${tokenDuration.toUTCString()}; SameSite=None; Secure`
       setTimeout(() => {
         navigate("/todo")
       }, 1000)
 
-      console.log(response)
-      console.log(token)
-      console.log(tokenDuration)
+      if (response.status == 200) {
+        Swal.fire({
+          icon: "success",
+          title: "登入成功",
+          text: "歡迎回來!",
+          timer: 2000,
+          timerProgressBar: false,
+        })
+      }
     } catch (error) {
       console.log("catch error:", error)
       Swal.fire({
@@ -78,8 +91,10 @@ function Login() {
             id='password'
             placeholder='請輸入密碼'
             ref={passwordRef}
+            onChange={handlePasswordChange}
             required
           />
+          <span>{isPasswordEmpty ? "密碼必須至少包含6個字符" : ""}</span>
           <input
             className='formControls_btnSubmit'
             type='button'
