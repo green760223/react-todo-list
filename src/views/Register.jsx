@@ -6,7 +6,7 @@ import Swal from "sweetalert2"
 function Register() {
   // Read environment variables
   const { VITE_APP_HOST } = import.meta.env
-
+  // Set state
   const navigate = useNavigate()
   const emailRef = useRef()
   const nicknameRef = useRef()

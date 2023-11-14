@@ -611,6 +611,27 @@ nav ul a span {
   text-decoration: none;
 }
 
+.empty_container {
+  text-align: center;
+}
+
+.empty_text {
+  width: 100%;
+  text-align: center;
+  padding: 30px;
+}
+
+.text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.empty_img {
+  width: 70%;
+  margin: auto;
+}
+
 /*======================
     Page Not Found
 =======================*/

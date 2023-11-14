@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons"
 import Swal from "sweetalert2"
 import axios from "axios"
+import empty from "../images/empty.png"
 
 function Todo() {
   // Read environment variables
@@ -13,31 +14,56 @@ function Todo() {
   // Set state
   const [nickName, setNickName] = useState("")
   const [todoList, setTodoList] = useState([])
-  const [isTodoEmpty, setIsTodoEmpty] = useState(true)
+  const [newTodoList, setNewTodoList] = useState("")
+  const [isTodoListEmpty, setIsTodoListEmpty] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
+  // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
-    checkAuthToken()
+    checkAuthToken(), getTodosList()
   }, [])
 
-  // Get token from cookie
-  const token = document.cookie.split("=")[1]
-  console.log("token:", token)
-
-  // Check auth token and get current todo list
-  const handleNewTodo = () => {
-    // navigate("/login")
-  }
-
-  // Check auth token
-  const checkAuthToken = async () => {
+  // Get todo list from server
+  const getTodosList = async () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1]
     const params = {
       headers: {
         Authorization: token,
       },
     }
+    const todosList = await axios.get(`${VITE_APP_HOST}/todos`, params)
+    console.log("todosList:", todosList.data.data.length)
 
+    if (todosList.data.data.length > 0) {
+      setIsTodoListEmpty(false)
+      console.log("todosList:", "目前有待辦事項須完成")
+      // setNewTodoList(todosList.data)
+    } else {
+      setIsTodoListEmpty(true)
+      console.log("todosList:", "目前暫無待辦事項")
+    }
+  }
+
+  // Check auth token and get current todo list
+  const addNewTodoItem = () => {
+    // navigate("/login")
+  }
+
+  // Check auth token and get nickname
+  const checkAuthToken = async () => {
     try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        ?.split("=")[1]
+      const params = {
+        headers: {
+          Authorization: token,
+        },
+      }
       const response = await axios.get(
         `${VITE_APP_HOST}/users/checkout`,
         params
@@ -47,11 +73,11 @@ function Todo() {
         setIsAuthenticated(true)
       }
     } catch (error) {
-      console.log(error.response.data)
+      console.log("error:", error.response.data)
       Swal.fire({
         icon: "error",
         title: "登入失敗",
-        text: "請返回首頁重新登入",
+        text: "您尚未登入，請返回首頁後重新登入使用！",
         timer: 2000,
         confirmButtonText: "確認",
       })
@@ -64,6 +90,22 @@ function Todo() {
 
   // Logout function
   const handleLogout = async () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1]
+
+    if (!token) {
+      Swal.fire({
+        icon: "error",
+        title: "登出失敗",
+        text: "您尚未登入，請返回首頁後重新登入使用！",
+        timer: 2000,
+        confirmButtonText: "確認",
+      })
+      return
+    }
+
     const params = {
       headers: {
         Authorization: token,
@@ -84,6 +126,7 @@ function Todo() {
           timer: 2000,
           timerProgressBar: false,
         })
+        setIsAuthenticated(false)
         setTimeout(() => {
           navigate("/")
         }, 2000)
@@ -122,10 +165,22 @@ function Todo() {
           <div className='todoList_Content'>
             <div className='inputBox'>
               <input type='text' placeholder='請輸入待辦事項' />
-              <a href='#' onClick={handleNewTodo}>
+              <a href='#' onClick={addNewTodoItem}>
                 <FontAwesomeIcon icon={faPlus} />
               </a>
             </div>
+            {isTodoListEmpty ? (
+              <div className='empty_container'>
+                <div className='empty_text'>
+                  <h2 className='text'>目前尚無代辦事項</h2>
+                </div>
+                <div className='empty_img'>
+                  <img src={empty} alt='empty_img' />
+                </div>
+              </div>
+            ) : (
+              <h2>目前有待辦事項須完成</h2>
+            )}
             <div className='todoList_list'>
               <ul className='todoList_tab'>
                 <li>

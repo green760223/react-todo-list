@@ -1,15 +1,24 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import axios from "axios"
 
 function Login() {
+  // Read environment variables
   const { VITE_APP_HOST } = import.meta.env
-  const navigate = useNavigate()
-  const emailRef = useRef()
-  const passwordRef = useRef()
+
+  // Set state
   const [isEmailEmpty, setIsEmailEmpty] = useState(true)
   const [isPasswordEmpty, setIsPasswordEmpty] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const emailRef = useRef()
+  const passwordRef = useRef()
+  const navigate = useNavigate()
+
+  // Check auth token when component mounted
+  useEffect(() => {
+    checkAuthToken(), console.log("Login component mounted", isAuthenticated)
+  }, [])
 
   // Email input check function
   const handleEmailChange = () => {
@@ -38,6 +47,8 @@ function Login() {
       const tokenDuration = new Date()
       tokenDuration.setDate(tokenDuration.getDate() + 1)
       document.cookie = `token=${token}; expires=${tokenDuration.toUTCString()}; SameSite=None; Secure`
+      setIsAuthenticated(true)
+
       setTimeout(() => {
         navigate("/todo")
       }, 1000)
@@ -59,6 +70,34 @@ function Login() {
         text: "請確認是否正確輸入Email或密碼",
         confirmButtonText: "確認",
       })
+    }
+  }
+
+  // Check if user is authenticated
+  const checkAuthToken = async () => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="))
+      ?.split("=")[1]
+
+    console.log(token)
+    const params = {
+      headers: {
+        Authorization: token,
+      },
+    }
+
+    try {
+      const response = await axios.get(
+        `${VITE_APP_HOST}/users/checkout`,
+        params
+      )
+      if (response.status == 200) {
+        setIsAuthenticated(true)
+        navigate("/todo")
+      }
+    } catch (error) {
+      // console.log(error.response.data)
     }
   }
 
