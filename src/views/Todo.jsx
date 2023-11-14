@@ -14,6 +14,7 @@ function Todo() {
   const [nickName, setNickName] = useState("")
   const [todoList, setTodoList] = useState([])
   const [isTodoEmpty, setIsTodoEmpty] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
     checkAuthToken()
@@ -41,24 +42,35 @@ function Todo() {
         `${VITE_APP_HOST}/users/checkout`,
         params
       )
-      console.log(response)
-      if (response) {
+      if (response.status == 200) {
         setNickName(response.data.nickname)
-        console.log("nickname:", response.data.nickname)
+        setIsAuthenticated(true)
       }
     } catch (error) {
-      console.log(error)
+      console.log(error.response.data)
+      Swal.fire({
+        icon: "error",
+        title: "登入失敗",
+        text: "請返回首頁重新登入",
+        timer: 2000,
+        confirmButtonText: "確認",
+      })
+
+      setTimeout(() => {
+        navigate("/")
+      }, 2000)
     }
   }
 
   // Logout function
   const handleLogout = async () => {
+    const params = {
+      headers: {
+        Authorization: token,
+      },
+    }
+
     try {
-      const params = {
-        headers: {
-          Authorization: token,
-        },
-      }
       const response = await axios.post(
         `${VITE_APP_HOST}/users/sign_out`,
         {},
@@ -77,17 +89,16 @@ function Todo() {
         }, 2000)
       }
     } catch (error) {
-      console.log(error.response.data)
       Swal.fire({
         icon: "error",
         title: "登出失敗",
-        text: "請確認是否正確輸入Email或密碼",
+        text: error.response.data,
         confirmButtonText: "確認",
       })
     }
   }
 
-  return (
+  return isAuthenticated ? (
     <>
       <div id='todoListPage' className='bg-half'>
         <nav>
@@ -220,7 +231,7 @@ function Todo() {
         </div>
       </div>
     </>
-  )
+  ) : null
 }
 
 export default Todo
