@@ -1,10 +1,91 @@
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons"
+import Swal from "sweetalert2"
+import axios from "axios"
 
 function Todo() {
   // Read environment variables
   const { VITE_APP_HOST } = import.meta.env
-
   const navigate = useNavigate()
+
+  // Set state
+  const [nickName, setNickName] = useState("")
+  const [todoList, setTodoList] = useState([])
+  const [isTodoEmpty, setIsTodoEmpty] = useState(true)
+
+  useEffect(() => {
+    checkAuthToken()
+  }, [])
+
+  // Get token from cookie
+  const token = document.cookie.split("=")[1]
+  console.log("token:", token)
+
+  // Check auth token and get current todo list
+  const handleNewTodo = () => {
+    // navigate("/login")
+  }
+
+  // Check auth token
+  const checkAuthToken = async () => {
+    const params = {
+      headers: {
+        Authorization: token,
+      },
+    }
+
+    try {
+      const response = await axios.get(
+        `${VITE_APP_HOST}/users/checkout`,
+        params
+      )
+      console.log(response)
+      if (response) {
+        setNickName(response.data.nickname)
+        console.log("nickname:", response.data.nickname)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      const params = {
+        headers: {
+          Authorization: token,
+        },
+      }
+      const response = await axios.post(
+        `${VITE_APP_HOST}/users/sign_out`,
+        {},
+        params
+      )
+      if (response.status == 200) {
+        Swal.fire({
+          icon: "success",
+          title: "登出成功",
+          text: "歡迎下次再來",
+          timer: 2000,
+          timerProgressBar: false,
+        })
+        setTimeout(() => {
+          navigate("/")
+        }, 2000)
+      }
+    } catch (error) {
+      console.log(error.response.data)
+      Swal.fire({
+        icon: "error",
+        title: "登出失敗",
+        text: "請確認是否正確輸入Email或密碼",
+        confirmButtonText: "確認",
+      })
+    }
+  }
 
   return (
     <>
@@ -16,11 +97,13 @@ function Todo() {
           <ul>
             <li className='todo_sm'>
               <a href='#'>
-                <span>王小明的代辦</span>
+                <span>{nickName}的代辦</span>
               </a>
             </li>
             <li>
-              <a href='#loginPage'>登出</a>
+              <a href='#' onClick={handleLogout}>
+                登出
+              </a>
             </li>
           </ul>
         </nav>
@@ -28,8 +111,8 @@ function Todo() {
           <div className='todoList_Content'>
             <div className='inputBox'>
               <input type='text' placeholder='請輸入待辦事項' />
-              <a href='#'>
-                <i className='fa fa-plus'></i>
+              <a href='#' onClick={handleNewTodo}>
+                <FontAwesomeIcon icon={faPlus} />
               </a>
             </div>
             <div className='todoList_list'>
