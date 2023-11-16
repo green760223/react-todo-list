@@ -632,6 +632,10 @@ nav ul a span {
   margin: auto;
 }
 
+.icon-plus {
+  margin-bottom: 5px;
+}
+
 /*======================
     Page Not Found
 =======================*/

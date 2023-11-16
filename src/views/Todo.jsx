@@ -12,11 +12,18 @@ function Todo() {
   const navigate = useNavigate()
 
   // Set state
+  const addTodoItemRef = useRef()
   const [nickName, setNickName] = useState("")
   const [todoList, setTodoList] = useState([])
+  const [finishedTodoList, setFinishedTodoList] = useState(0)
+  const [unfinishedTodoList, setUnfinishedTodoList] = useState(0)
   const [newTodoList, setNewTodoList] = useState("")
   const [isTodoListEmpty, setIsTodoListEmpty] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const token = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("token="))
+    ?.split("=")[1]
 
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
@@ -25,40 +32,71 @@ function Todo() {
 
   // Get todo list from server
   const getTodosList = async () => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1]
     const params = {
       headers: {
         Authorization: token,
       },
     }
     const todosList = await axios.get(`${VITE_APP_HOST}/todos`, params)
+    console.log("todosList:", todosList.data.data)
     console.log("todosList:", todosList.data.data.length)
 
     if (todosList.data.data.length > 0) {
       setIsTodoListEmpty(false)
       console.log("todosList:", "目前有待辦事項須完成")
-      // setNewTodoList(todosList.data)
+
+      // Get total number of un finished todo list
+      setUnfinishedTodoList(
+        todosList.data.data.filter((item) => item.status === false).length
+      )
+
+      // Get todo list
+      setTodoList(todosList.data.data)
     } else {
       setIsTodoListEmpty(true)
-      console.log("todosList:", "目前暫無待辦事項")
     }
   }
 
   // Check auth token and get current todo list
-  const addNewTodoItem = () => {
-    // navigate("/login")
+  const addNewTodoItem = async (e) => {
+    e.preventDefault()
+    const newItem = addTodoItemRef.current.value
+    console.log("newItem:", newItem)
+
+    const params = {
+      headers: {
+        Authorization: token,
+      },
+    }
+
+    try {
+      const response = await axios.post(
+        `${VITE_APP_HOST}/todos`,
+        { content: newItem },
+        params
+      )
+
+      if (response.status == 201) {
+        Swal.fire({
+          icon: "success",
+          title: "新增成功",
+          text: "已成功新增待辦事項",
+          timer: 2000,
+          timerProgressBar: false,
+        })
+        // setNewTodoList(newItem)
+        addTodoItemRef.current.value = ""
+        // getTodosList()
+        console.log("response:", response.data)
+      }
+    } catch (error) {
+      console.log("error:", error.response.data)
+    }
   }
 
   // Check auth token and get nickname
   const checkAuthToken = async () => {
     try {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        ?.split("=")[1]
       const params = {
         headers: {
           Authorization: token,
@@ -90,11 +128,6 @@ function Todo() {
 
   // Logout function
   const handleLogout = async () => {
-    const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="))
-      ?.split("=")[1]
-
     if (!token) {
       Swal.fire({
         icon: "error",
@@ -164,9 +197,13 @@ function Todo() {
         <div className='conatiner todoListPage vhContainer'>
           <div className='todoList_Content'>
             <div className='inputBox'>
-              <input type='text' placeholder='請輸入待辦事項' />
-              <a href='#' onClick={addNewTodoItem}>
-                <FontAwesomeIcon icon={faPlus} />
+              <input
+                type='text'
+                ref={addTodoItemRef}
+                placeholder='請輸入待辦事項'
+              />
+              <a href='' onClick={addNewTodoItem}>
+                <FontAwesomeIcon className='icon-plus' icon={faPlus} />
               </a>
             </div>
             {isTodoListEmpty ? (
@@ -181,7 +218,7 @@ function Todo() {
             ) : (
               <h2>目前有待辦事項須完成</h2>
             )}
-            <div className='todoList_list'>
+            {/* <div className='todoList_list'>
               <ul className='todoList_tab'>
                 <li>
                   <a href='#' className='active'>
@@ -277,11 +314,11 @@ function Todo() {
                   </li>
                 </ul>
                 <div className='todoList_statistics'>
-                  <p>5 個已完成項目</p>
+                  <p>{unfinishedTodoList} 個待完成項目</p>
                   <a href='#'>清除已完成項目</a>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
