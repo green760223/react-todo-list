@@ -20,6 +20,7 @@ function Todo() {
   const [newTodoList, setNewTodoList] = useState("")
   const [isTodoListEmpty, setIsTodoListEmpty] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [toggleState, setToggleState] = useState("全部")
   const token = document.cookie
     .split("; ")
     .find((row) => row.startsWith("token="))
@@ -37,21 +38,21 @@ function Todo() {
         Authorization: token,
       },
     }
-    const todosList = await axios.get(`${VITE_APP_HOST}/todos`, params)
-    console.log("todosList:", todosList.data.data)
-    console.log("todosList:", todosList.data.data.length)
+    const getList = await axios.get(`${VITE_APP_HOST}/todos`, params)
 
-    if (todosList.data.data.length > 0) {
+    console.log("todoList:", getList.data.data.length)
+
+    if (getList.data.data.length > 0) {
       setIsTodoListEmpty(false)
-      console.log("todosList:", "目前有待辦事項須完成")
 
       // Get total number of un finished todo list
       setUnfinishedTodoList(
-        todosList.data.data.filter((item) => item.status === false).length
+        getList.data.data.filter((item) => item.status === false).length
       )
 
       // Get todo list
-      setTodoList(todosList.data.data)
+      setTodoList(getList.data.data)
+      console.log("todoList:", todoList)
     } else {
       setIsTodoListEmpty(true)
     }
@@ -91,6 +92,13 @@ function Todo() {
       }
     } catch (error) {
       console.log("error:", error.response.data)
+      Swal.fire({
+        icon: "error",
+        title: "新增失敗",
+        text: "待辦事項不可為空，請重新輸入",
+        timer: 2000,
+        confirmButtonText: "確認",
+      })
     }
   }
 
@@ -174,6 +182,12 @@ function Todo() {
     }
   }
 
+  // Swtich todo list status for tabs
+  const switchTodoListStatus = (e) => {
+    e.preventDefault()
+    setToggleState(e.target.textContent)
+  }
+
   return isAuthenticated ? (
     <>
       <div id='todoListPage' className='bg-half'>
@@ -207,6 +221,7 @@ function Todo() {
               </a>
             </div>
             {isTodoListEmpty ? (
+              /* 顯示無待辦事項 */
               <div className='empty_container'>
                 <div className='empty_text'>
                   <h2 className='text'>目前尚無代辦事項</h2>
@@ -216,109 +231,70 @@ function Todo() {
                 </div>
               </div>
             ) : (
-              <h2>目前有待辦事項須完成</h2>
-            )}
-            {/* <div className='todoList_list'>
-              <ul className='todoList_tab'>
-                <li>
-                  <a href='#' className='active'>
-                    全部
-                  </a>
-                </li>
-                <li>
-                  <a href='#'>待完成</a>
-                </li>
-                <li>
-                  <a href='#'>已完成</a>
-                </li>
-              </ul>
-              <div className='todoList_items'>
-                <ul className='todoList_item'>
+              /* 顯示待辦清單 */
+              <div className='todoList_list'>
+                <ul className='todoList_tab'>
                   <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>把冰箱發霉的檸檬拿去丟</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
+                    <a
+                      href=''
+                      className={toggleState === "全部" ? "active" : ""}
+                      onClick={switchTodoListStatus}>
+                      全部
                     </a>
                   </li>
                   <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>打電話叫媽媽匯款給我</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
+                    <a
+                      href=''
+                      className={toggleState === "待完成" ? "active" : ""}
+                      onClick={switchTodoListStatus}>
+                      待完成
                     </a>
                   </li>
                   <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>整理電腦資料夾</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
-                    </a>
-                  </li>
-                  <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>繳電費水費瓦斯費</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
-                    </a>
-                  </li>
-                  <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>約vicky禮拜三泡溫泉</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
-                    </a>
-                  </li>
-                  <li>
-                    <label className='todoList_label'>
-                      <input
-                        className='todoList_input'
-                        type='checkbox'
-                        value='true'
-                      />
-                      <span>約ada禮拜四吃晚餐</span>
-                    </label>
-                    <a href='#'>
-                      <i className='fa fa-times'></i>
+                    <a
+                      href=''
+                      className={toggleState === "已完成" ? "active" : ""}
+                      onClick={switchTodoListStatus}>
+                      已完成
                     </a>
                   </li>
                 </ul>
-                <div className='todoList_statistics'>
-                  <p>{unfinishedTodoList} 個待完成項目</p>
-                  <a href='#'>清除已完成項目</a>
+                <div className='todoList_items'>
+                  <ul className='todoList_item'>
+                    <li>
+                      <label className='todoList_label'>
+                        <input
+                          className='todoList_input'
+                          type='checkbox'
+                          value='true'
+                        />
+                        <span>把冰箱發霉的檸檬拿去丟</span>
+                      </label>
+                      <a href='#'>
+                        <i className='fa fa-times'></i>
+                      </a>
+                    </li>
+                    <li>
+                      <label className='todoList_label'>
+                        <input
+                          className='todoList_input'
+                          type='checkbox'
+                          value='true'
+                        />
+                        <span>整理電腦資料夾</span>
+                      </label>
+                      <a href='#'>
+                        <i className='fa fa-times'></i>
+                      </a>
+                    </li>
+                  </ul>
+                  <div className='todoList_statistics'>
+                    <p>{unfinishedTodoList} 個待完成項目</p>
+                    <a href='#'>清除已完成項目</a>
+                  </div>
                 </div>
               </div>
-            </div> */}
+            )}
           </div>
         </div>
       </div>
