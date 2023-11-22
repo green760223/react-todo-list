@@ -29,7 +29,7 @@ function Todo() {
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
     checkAuthToken(), getTodosList()
-  }, [])
+  }, [unfinishedTodoList])
 
   // Get todo list from server
   const getTodosList = async () => {
@@ -87,7 +87,7 @@ function Todo() {
         })
         // setNewTodoList(newItem)
         addTodoItemRef.current.value = ""
-        // getTodosList()
+        getTodosList()
         console.log("response:", response.data)
       }
     } catch (error) {
@@ -261,32 +261,24 @@ function Todo() {
                 </ul>
                 <div className='todoList_items'>
                   <ul className='todoList_item'>
-                    <li>
-                      <label className='todoList_label'>
-                        <input
-                          className='todoList_input'
-                          type='checkbox'
-                          value='true'
-                        />
-                        <span>把冰箱發霉的檸檬拿去丟</span>
-                      </label>
-                      <a href='#'>
-                        <i className='fa fa-times'></i>
-                      </a>
-                    </li>
-                    <li>
-                      <label className='todoList_label'>
-                        <input
-                          className='todoList_input'
-                          type='checkbox'
-                          value='true'
-                        />
-                        <span>整理電腦資料夾</span>
-                      </label>
-                      <a href='#'>
-                        <i className='fa fa-times'></i>
-                      </a>
-                    </li>
+                    {todoList.map((item) => {
+                      return (
+                        <li key={item.id}>
+                          <label className='todoList_label'>
+                            <input
+                              className='todoList_input'
+                              type='checkbox'
+                              value='true'
+                              defaultChecked={item.status}
+                            />
+                            <span>{item.content}</span>
+                          </label>
+                          <a href='#'>
+                            <i className='fa fa-times'></i>
+                          </a>
+                        </li>
+                      )
+                    })}
                   </ul>
                   <div className='todoList_statistics'>
                     <p>{unfinishedTodoList} 個待完成項目</p>
