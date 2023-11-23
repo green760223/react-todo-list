@@ -636,6 +636,12 @@ nav ul a span {
   margin-bottom: 5px;
 }
 
+.button_reset {
+  border: 0;
+  background: transparent;
+  padding-bottom: 10px;
+}
+
 /*======================
     Page Not Found
 =======================*/

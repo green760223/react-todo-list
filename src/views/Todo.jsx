@@ -21,10 +21,19 @@ function Todo() {
   const [isTodoListEmpty, setIsTodoListEmpty] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [toggleState, setToggleState] = useState("全部")
+
+  // Get token from cookie
   const token = document.cookie
     .split("; ")
     .find((row) => row.startsWith("token="))
     ?.split("=")[1]
+
+  // Set header
+  const header = {
+    headers: {
+      Authorization: token,
+    },
+  }
 
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
@@ -33,12 +42,7 @@ function Todo() {
 
   // Get todo list from server
   const getTodosList = async () => {
-    const params = {
-      headers: {
-        Authorization: token,
-      },
-    }
-    const getList = await axios.get(`${VITE_APP_HOST}/todos`, params)
+    const getList = await axios.get(`${VITE_APP_HOST}/todos`, header)
 
     console.log("todoList:", getList.data.data.length)
 
@@ -58,23 +62,17 @@ function Todo() {
     }
   }
 
-  // Check auth token and get current todo list
+  // Add new todo list item
   const addNewTodoItem = async (e) => {
     e.preventDefault()
     const newItem = addTodoItemRef.current.value
     console.log("newItem:", newItem)
 
-    const params = {
-      headers: {
-        Authorization: token,
-      },
-    }
-
     try {
       const response = await axios.post(
         `${VITE_APP_HOST}/todos`,
         { content: newItem },
-        params
+        header
       )
 
       if (response.status == 201) {
@@ -105,14 +103,9 @@ function Todo() {
   // Check auth token and get nickname
   const checkAuthToken = async () => {
     try {
-      const params = {
-        headers: {
-          Authorization: token,
-        },
-      }
       const response = await axios.get(
         `${VITE_APP_HOST}/users/checkout`,
-        params
+        header
       )
       if (response.status == 200) {
         setNickName(response.data.nickname)
@@ -147,17 +140,11 @@ function Todo() {
       return
     }
 
-    const params = {
-      headers: {
-        Authorization: token,
-      },
-    }
-
     try {
       const response = await axios.post(
         `${VITE_APP_HOST}/users/sign_out`,
         {},
-        params
+        header
       )
       if (response.status == 200) {
         Swal.fire({
@@ -186,6 +173,16 @@ function Todo() {
   const switchTodoListStatus = (e) => {
     e.preventDefault()
     setToggleState(e.target.textContent)
+  }
+
+  // Delete todo list item
+  const handleDeleteItem = async (id) => {
+    console.log("id:", id)
+    const deteleItem = await axios.delete(
+      `${VITE_APP_HOST}/todos/${id}`,
+      header
+    )
+    getTodosList()
   }
 
   return isAuthenticated ? (
@@ -273,16 +270,18 @@ function Todo() {
                             />
                             <span>{item.content}</span>
                           </label>
-                          <a href='#'>
-                            <i className='fa fa-times'></i>
-                          </a>
+                          <button
+                            className='button_reset'
+                            onClick={() => handleDeleteItem(item.id)}>
+                            <FontAwesomeIcon icon={faTimes} />
+                          </button>
                         </li>
                       )
                     })}
                   </ul>
                   <div className='todoList_statistics'>
                     <p>{unfinishedTodoList} 個待完成項目</p>
-                    <a href='#'>清除已完成項目</a>
+                    <a href=''>清除已完成項目</a>
                   </div>
                 </div>
               </div>
