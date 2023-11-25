@@ -185,6 +185,26 @@ function Todo() {
     getTodosList()
   }
 
+  // tab switch function for todo list
+  const todoStateSwitch = useMemo(() => {
+    switch (toggleState) {
+      case "全部":
+        return todoList
+      case "待完成":
+        return todoList.filter((item) => item.status === false)
+      case "已完成":
+        return todoList.filter((item) => item.status === true)
+      default:
+        return todoList
+    }
+  }, [toggleState, todoList])
+
+  // Toggle todo list status
+  const toggleStatus = async (id) => {
+    await axios.patch(`${VITE_APP_HOST}/todos/${id}/toggle`, {}, header)
+    getTodosList()
+  }
+
   return isAuthenticated ? (
     <>
       <div id='todoListPage' className='bg-half'>
@@ -258,15 +278,20 @@ function Todo() {
                 </ul>
                 <div className='todoList_items'>
                   <ul className='todoList_item'>
-                    {todoList.map((item) => {
+                    {todoStateSwitch.map((item) => {
                       return (
                         <li key={item.id}>
                           <label className='todoList_label'>
                             <input
                               className='todoList_input'
                               type='checkbox'
-                              value='true'
-                              defaultChecked={item.status}
+                              value={item.status}
+                              checked={item.status}
+                              onChange={(e) => {
+                                toggleStatus(item.id, e)
+                              }}
+                              // value='true'
+                              // defaultChecked={item.status}
                             />
                             <span>{item.content}</span>
                           </label>
