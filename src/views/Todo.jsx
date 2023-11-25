@@ -212,7 +212,11 @@ function Todo() {
     doneTodos.map(async (item) => {
       await axios.delete(`${VITE_APP_HOST}/todos/${item.id}`, header)
     })
+
     getTodosList()
+    setTimeout(() => {
+      setToggleState("全部")
+    }, 1000)
   }
 
   return isAuthenticated ? (
