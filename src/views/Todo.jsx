@@ -38,7 +38,7 @@ function Todo() {
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
     checkAuthToken(), getTodosList()
-  }, [unfinishedTodoList])
+  }, [unfinishedTodoList, finishedTodoList])
 
   // Get todo list from server
   const getTodosList = async () => {
@@ -205,6 +205,16 @@ function Todo() {
     getTodosList()
   }
 
+  // Clear finished todo list items
+  const handleClearFininshedItems = async (e) => {
+    e.preventDefault()
+    const doneTodos = todoList.filter((item) => item.status === true)
+    doneTodos.map(async (item) => {
+      await axios.delete(`${VITE_APP_HOST}/todos/${item.id}`, header)
+    })
+    getTodosList()
+  }
+
   return isAuthenticated ? (
     <>
       <div id='todoListPage' className='bg-half'>
@@ -306,7 +316,9 @@ function Todo() {
                   </ul>
                   <div className='todoList_statistics'>
                     <p>{unfinishedTodoList} 個待完成項目</p>
-                    <a href=''>清除已完成項目</a>
+                    <a href='#' onClick={handleClearFininshedItems}>
+                      清除已完成項目
+                    </a>
                   </div>
                 </div>
               </div>
