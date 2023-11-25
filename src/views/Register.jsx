@@ -31,8 +31,8 @@ function Register() {
     if (password !== confirmPassword) {
       Swal.fire({
         icon: "error",
-        title: "註冊失敗",
-        text: "請確認密碼是否正確",
+        title: "Registration failed",
+        text: "Please confirm that the password is correct",
       })
       return
     }
@@ -46,8 +46,8 @@ function Register() {
       console.log(response)
       Swal.fire({
         icon: "success",
-        title: "註冊成功",
-        text: "歡迎加入!",
+        title: "Registration successful",
+        text: "Welcome to the service!",
         timer: 2000,
         timerProgressBar: false,
       })
@@ -57,7 +57,7 @@ function Register() {
       console.log("catch error:", error.response.data.message)
       Swal.fire({
         icon: "error",
-        title: "註冊失敗",
+        title: "Registration failed",
         text: error.response.data.message,
       })
     }
@@ -67,7 +67,7 @@ function Register() {
     <>
       <div>
         <form className='formControls' action='index.html'>
-          <h2 className='formControls_txt'>註冊帳號</h2>
+          <h2 className='formControls_txt'>Register Account</h2>
           <label className='formControls_label' htmlFor='email'>
             Email
           </label>
@@ -76,54 +76,54 @@ function Register() {
             type='email'
             id='email'
             name='email'
-            placeholder='請輸入Eamil'
+            placeholder='Please enter your email'
             ref={emailRef}
             required
           />
           <label className='formControls_label' htmlFor='nickname'>
-            您的暱稱
+            Your nickname
           </label>
           <input
             className='formControls_input'
             type='text'
             id='nickname'
-            placeholder='請輸入您的暱稱'
+            placeholder='Please enter your nickname'
             name='nickname'
             ref={nicknameRef}
             required
           />
           <label className='formControls_label' htmlFor='password'>
-            密碼
+            Password
           </label>
           <input
             className='formControls_input'
             type='password'
             id='password'
             name='password'
-            placeholder='請輸入密碼'
+            placeholder='Please enter your password'
             ref={passwordRef}
             required
           />
           <label className='formControls_label' htmlFor='confirm_password'>
-            請再次輸入密碼
+            Confirm Password
           </label>
           <input
             className='formControls_input'
             type='password'
             id='confirm_password'
             name='confirm_password'
-            placeholder='請再次輸入密碼'
+            placeholder='Please confirm your password'
             ref={confirmPasswordRef}
             required
           />
           <input
             type='button'
-            value='註冊帳號'
+            value='Sign Up'
             className='formControls_btnSubmit'
             onClick={handleSignUp}
           />
           <a className='formControls_btnLink' href='#'>
-            登入
+            Login
           </a>
         </form>
       </div>

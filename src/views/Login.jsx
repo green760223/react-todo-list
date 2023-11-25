@@ -17,7 +17,7 @@ function Login() {
 
   // Check auth token when component mounted
   useEffect(() => {
-    checkAuthToken(), console.log("Login component mounted", isAuthenticated)
+    checkAuthToken()
   }, [])
 
   // Email input check function
@@ -56,19 +56,18 @@ function Login() {
       if (response.status == 200) {
         Swal.fire({
           icon: "success",
-          title: "登入成功",
-          text: "歡迎回來!",
+          title: "Login success",
+          text: "Welcome back!",
           timer: 2000,
           timerProgressBar: false,
         })
       }
     } catch (error) {
-      console.log("catch error:", error)
       Swal.fire({
         icon: "error",
-        title: "登入失敗",
-        text: "請確認是否正確輸入Email或密碼",
-        confirmButtonText: "確認",
+        title: "Login failed",
+        text: "Please confirm if the email and password are entered correctly",
+        confirmButtonText: "Confirm",
       })
     }
   }
@@ -80,7 +79,6 @@ function Login() {
       .find((row) => row.startsWith("token="))
       ?.split("=")[1]
 
-    console.log(token)
     const params = {
       headers: {
         Authorization: token,
@@ -96,16 +94,14 @@ function Login() {
         setIsAuthenticated(true)
         navigate("/todo")
       }
-    } catch (error) {
-      // console.log(error.response.data)
-    }
+    } catch (error) {}
   }
 
   return (
     <>
       <div>
         <form className='formControls' action='index.html'>
-          <h2 className='formControls_txt'>最實用的線上代辦事項服務</h2>
+          <h2 className='formControls_txt'>The online to-do service</h2>
           <label className='formControls_label' htmlFor='email'>
             Email
           </label>
@@ -114,34 +110,38 @@ function Login() {
             type='text'
             id='email'
             name='email'
-            placeholder='請輸入 email'
+            placeholder='Please enter your email'
             ref={emailRef}
             onChange={handleEmailChange}
             required
           />
-          <span>{isEmailEmpty ? "此欄位不可留空" : ""}</span>
+          <span>{isEmailEmpty ? "This field cannot be left blank" : ""}</span>
           <label className='formControls_label' htmlFor='password'>
-            密碼
+            Password
           </label>
           <input
             className='formControls_input'
             type='password'
             name='password'
             id='password'
-            placeholder='請輸入密碼'
+            placeholder='Please enter your password'
             ref={passwordRef}
             onChange={handlePasswordChange}
             required
           />
-          <span>{isPasswordEmpty ? "密碼必須至少包含6個字符" : ""}</span>
+          <span>
+            {isPasswordEmpty
+              ? "Password must contain at least 6 characters"
+              : ""}
+          </span>
           <input
             className='formControls_btnSubmit'
             type='button'
             onClick={handleLogin}
-            value='登入'
+            value='Login'
           />
           <a className='formControls_btnLink' href='#register'>
-            註冊帳號
+            Register
           </a>
         </form>
       </div>
