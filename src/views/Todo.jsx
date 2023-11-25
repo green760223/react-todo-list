@@ -15,7 +15,7 @@ function Todo() {
   const addTodoItemRef = useRef()
   const [nickName, setNickName] = useState("")
   const [todoList, setTodoList] = useState([])
-  const [finishedTodoList, setFinishedTodoList] = useState(0)
+  // const [finishedTodoList, setFinishedTodoList] = useState(0)
   const [unfinishedTodoList, setUnfinishedTodoList] = useState(0)
   const [isTodoListEmpty, setIsTodoListEmpty] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -37,7 +37,8 @@ function Todo() {
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
     checkAuthToken(), getTodosList()
-  }, [unfinishedTodoList])
+    console.log("useEffct:", useEffect)
+  }, [])
 
   // Get todo list from server
   const getTodosList = async () => {
@@ -193,7 +194,12 @@ function Todo() {
 
   // Toggle todo list status
   const toggleStatus = async (id) => {
-    await axios.patch(`${VITE_APP_HOST}/todos/${id}/toggle`, {}, header)
+    const url = await axios.patch(
+      `${VITE_APP_HOST}/todos/${id}/toggle`,
+      {},
+      header
+    )
+
     getTodosList()
   }
 
@@ -205,9 +211,9 @@ function Todo() {
       await axios.delete(`${VITE_APP_HOST}/todos/${item.id}`, header)
     })
 
-    getTodosList()
     setTimeout(() => {
       setToggleState("All")
+      getTodosList()
     }, 1000)
   }
 
