@@ -97,6 +97,11 @@ function Login() {
     } catch (error) {}
   }
 
+  // Redirect to register page
+  const toRegisterPage = () => {
+    navigate("/register")
+  }
+
   return (
     <>
       <div>
@@ -140,7 +145,10 @@ function Login() {
             onClick={handleLogin}
             value='Login'
           />
-          <a className='formControls_btnLink' href='#register'>
+          <a
+            type='button'
+            className='formControls_btnLink'
+            onClick={toRegisterPage}>
             Register
           </a>
         </form>

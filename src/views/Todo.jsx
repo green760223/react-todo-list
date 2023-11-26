@@ -37,7 +37,6 @@ function Todo() {
   // Fetch todo list from server when component mounted and token is valid
   useEffect(() => {
     checkAuthToken(), getTodosList()
-    console.log("useEffct:", useEffect)
   }, [])
 
   // Get todo list from server
@@ -217,21 +216,28 @@ function Todo() {
     }, 1000)
   }
 
+  // Redirect to index page
+  const toIndexPage = () => {
+    navigate("/")
+  }
+
   return isAuthenticated ? (
     <>
       <div id='todoListPage' className='bg-half'>
         <nav>
           <h1>
-            <a href='#'>ONLINE TODO LIST</a>
+            <a type='button' onClick={toIndexPage}>
+              ONLINE TODO LIST
+            </a>
           </h1>
           <ul>
             <li className='todo_sm'>
-              <a href='#'>
+              <div>
                 <span>{nickName}'s To-Do List</span>
-              </a>
+              </div>
             </li>
             <li>
-              <a href='#' onClick={handleLogout}>
+              <a className='button_reset' type='button' onClick={handleLogout}>
                 Logout
               </a>
             </li>

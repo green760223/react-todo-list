@@ -1,5 +1,4 @@
-import { useState } from "react"
-import { Routes, Route, NavLink, HashRouter } from "react-router-dom"
+import { Routes, Route, HashRouter } from "react-router-dom"
 import Auth from "./views/Auth.jsx"
 import Todo from "./views/Todo.jsx"
 import Login from "./views/Login.jsx"
@@ -12,7 +11,7 @@ function App() {
     <HashRouter>
       <Routes>
         <Route path='/' element={<Auth />}>
-          <Route path='/' element={<Login />} />
+          <Route index element={<Login />} />
           <Route path='/register' element={<Register />} />
         </Route>
         <Route path='/todo' element={<Todo />} />

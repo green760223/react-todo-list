@@ -43,7 +43,7 @@ function Register() {
         `${VITE_APP_HOST}/users/sign_up`,
         signUpData
       )
-      console.log(response)
+
       Swal.fire({
         icon: "success",
         title: "Registration successful",
@@ -61,6 +61,11 @@ function Register() {
         text: error.response.data.message,
       })
     }
+  }
+
+  // Redirect to index page
+  const toIndexPage = () => {
+    navigate("/")
   }
 
   return (
@@ -122,7 +127,10 @@ function Register() {
             className='formControls_btnSubmit'
             onClick={handleSignUp}
           />
-          <a className='formControls_btnLink' href='#'>
+          <a
+            className='formControls_btnLink'
+            type='button'
+            onClick={toIndexPage}>
             Login
           </a>
         </form>
